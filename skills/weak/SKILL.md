@@ -37,6 +37,7 @@ user-invocable: true
 ### 1. 加载
 - topic 缺省 → 读 `config.json` 的 `activeTopic`(缺失按数据契约第九节兜底)。专题不存在 → 提示先 `/swcc-plan`,停止。
 - 读 `progress.json`、`knowledge-system.md`、`references.json`。
+- 读全局 `learner-profile.md`(若存在),据其中讲解偏好与盲区**调整出题/追问风格**——只调风格,不放松"只打薄弱点、默认直接考"的纪律。见 data-contract 第十四节。
 
 ### 2. 取薄弱点队列
 - 读 `weakPoints[]`,按 `nextReview` 升序;**到期的(≤今天)排最前**。

@@ -83,6 +83,7 @@ user-invocable: true
 - topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`（config 不存在或缺 activeTopic 时，按数据契约第九节「兜底」扫 `topics/` 自愈，不要直接报错）。
 - 该专题不存在 → 提示先 `/swcc-plan <topic>`，停止。
 - 读 `progress.json`、`knowledge-tree.md`、`knowledge-system.md`、`references.json`。
+- 读全局 `learner-profile.md`(若存在),据其中的讲解偏好与反复盲区**调整本次讲解/出题/追问风格**——只调风格,**不放松本技能纪律**(blog 级深度、考核才记薄弱)。见 data-contract 第十四节。
 
 ### 阶段 2：定位当前复习节点
 

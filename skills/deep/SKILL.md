@@ -28,6 +28,7 @@ user-invocable: true
 
 ### 1. 定位概念
 - 在 `knowledge-tree.md` / `knowledge-system.md` 里找到该 concept 所属节点与已有内容(挂了资料按数据契约第八节读相关章节)。找不到精确匹配 → 跟用户确认要挖的是哪个。
+- 读全局 `learner-profile.md`(若存在),据其中讲解偏好**调整深挖的讲法/类比风格**——只调风格,不放松"四段都要有实质内容"的要求。见 data-contract 第十四节。
 
 ### 2. （可选）联网补料
 - 尝试 `WebSearch`/`WebFetch` 找该概念在其他领域的应用、最新进展、经典对比。

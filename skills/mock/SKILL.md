@@ -32,6 +32,7 @@ user-invocable: true
 
 ### 1. 加载 & 选题篮
 - topic 缺省 → activeTopic(缺失按数据契约第九节兜底)。读 `knowledge-tree.md`(取 `level`、`kind`)、`knowledge-system.md`、`progress.json`、`references.json`。
+- 读全局 `learner-profile.md`(若存在),据其中风格偏好**调整出题/点评风格**——只调风格,不放松题型配比与独立评分纪律。见 data-contract 第十四节。
 - 按 mock-rubric 第一节组卷:**偏向 weakPoints 与低 mastery 节点(查漏)+ 主干高频点(覆盖)**;题型配比按 `kind`;难度按 `level`。
 
 宣布:
