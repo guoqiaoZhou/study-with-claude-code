@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "study-with-claude-code",
+  "description": "AI 驱动的通用复习系统 - 建知识树、闭环复习、系统评估掌握度、艾宾浩斯间隔复习",
+  "owner": {
+    "name": "guoqiaoZhou",
+    "url": "https://github.com/guoqiaoZhou"
+  },
+  "plugins": [
+    {
+      "name": "study-with-claude-code",
+      "description": "AI 驱动的通用复习系统：建知识树、闭环复习、系统评估掌握度、按艾宾浩斯曲线安排复习。",
+      "version": "0.1.0",
+      "author": {
+        "name": "guoqiaoZhou"
+      },
+      "source": "./",
+      "category": "education",
+      "homepage": "https://github.com/guoqiaoZhou/study-with-claude-code",
+      "tags": ["study", "review", "spaced-repetition", "interview-prep", "knowledge-tree", "learning"]
+    }
+  ]
+}
