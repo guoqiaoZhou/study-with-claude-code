@@ -1,7 +1,7 @@
 ---
 name: swcc-go
 description: 开始一次专题复习。自动定位当前该复习的知识点，先带用户把该节点的核心概念过一遍（讲透、点出易忽略的细节、可按需深挖），再用苏格拉底式追问考核，验证是否真懂。Use this skill when the user wants to start reviewing, studying, learning, drilling, or practicing a topic, or says "开始复习"、"go"、"复习一下 JVM"、"过一遍 Redis"、"带我学学"、"考考我".
-argument-hint: "[topic] [mode]"
+argument-hint: "[topic] [study|test] [concept|scenario|mixed]"
 user-invocable: true
 ---
 
@@ -11,9 +11,17 @@ user-invocable: true
 
 > 开始前先读数据契约:`${CLAUDE_PLUGIN_ROOT}/skills/_shared/data-contract.md`。本技能**只读不写**——所有进度/掌握度的落盘由 `/swcc-stop` 完成。
 
-参数:`$ARGUMENTS` —— 可选 topic（默认 activeTopic）、可选 mode。mode 含两层:
-- **取向**:默认 `study`(先讲后测);`test`(直接考，跳过讲解，适合已熟/快速检验)。
-- **考核题型**:`concept`/`scenario`/`mixed`（默认 `mixed`），只作用于考核阶段。
+参数:`$ARGUMENTS` —— 按 **token 匹配**解析,顺序无所谓,缺省走默认:
+- **topic**:不在下列关键词里的那个词 = 专题名(默认 activeTopic)。
+- **取向**(学还是考):`study`=先讲后测(**默认**);`test`=直接考、跳过讲解。
+- **题型**(只作用于考核阶段):`concept` / `scenario` / `mixed`(**默认**)。
+
+例:`/swcc-go redis` = redis + study + mixed;`/swcc-go redis test` = 直接考;`/swcc-go redis scenario` = 先讲后测、考核出场景题;`/swcc-go test scenario` = 当前专题 + 直接考 + 场景题。
+
+**三种切换取向的方式**:
+1. **调用时传参**:如上 `/swcc-go redis test`。
+2. **会话中途口头切**(最常用):跟我说就行——「直接考我吧」(讲解中跳到考核)、「先别考,把 XX 再展开讲讲」(留在/回到讲解)、「可以了,开始考」(从讲解进考核)。
+3. **自动**:定位到的是**到期薄弱点**(已学过)→ 直接进考核(相当于 `test`);**生疏/首次**的节点 → 默认先讲后测(`study`)。
 
 ---
 
@@ -44,6 +52,7 @@ user-invocable: true
 
 ### 阶段 1：加载专题
 
+- 先按上面「参数」对 `$ARGUMENTS` 做 token 解析,得到 topic / 取向(study|test) / 题型(concept|scenario|mixed)。
 - topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`（config 不存在或缺 activeTopic 时，按数据契约第九节「兜底」扫 `topics/` 自愈，不要直接报错）。
 - 该专题不存在 → 提示先 `/swcc-plan <topic>`，停止。
 - 读 `progress.json`、`knowledge-tree.md`、`knowledge-system.md`、`references.json`。
