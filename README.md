@@ -1,89 +1,91 @@
 # study-with-claude-code
 
-> AI 驱动的通用复习系统 —— 以 Claude Code 插件（一组 skill）的形式，帮你建立知识树、闭环复习、系统评估掌握度、按艾宾浩斯曲线安排复习，并让系统**越学越懂你**。不限技术栈，任何专题都能用。
+**English** | [简体中文](README.zh-CN.md)
 
-## 它解决什么
+> An AI-driven, general-purpose study & review system — shipped as a Claude Code plugin (a set of skills). It builds a knowledge tree, runs a closed-loop review cycle, scores your mastery objectively, schedules reviews on the Ebbinghaus curve, and **gets to know how you learn** over time. Not tied to any tech stack — works for any subject.
 
-把"看完就忘"的零散学习，变成一个会**复利**的闭环：
+## What it solves
+
+It turns scattered "read it and forget it" learning into a loop that **compounds**:
 
 ```
-建知识树 → 每天看该复习啥 → 先讲后测的闭环复习 → 系统评估+记薄弱点 → 复盘让系统更懂你
- /swcc-plan     /swcc-daily        /swcc-go            /swcc-stop          /swcc-compound
+build a tree → see what's due today → teach-then-test review → score + log weak points → reflect so it knows you better
+ /swcc-plan        /swcc-daily            /swcc-go               /swcc-stop                  /swcc-compound
 ```
 
-- **知识树自动生成**：给个专题，自动拆成结构化知识树 + 知识体系，可挂 PDF/文档为依据；**生成后强制用评审子智能体查漏补缺**。可对已有专题增量更新、**已学进度不丢**。
-- **先讲后测、从第一性讲起**：`/swcc-go` 先带你把知识点过一遍——复杂原理**从本质/设计哲学讲起**（先给对的视角再讲机制），讲完给你多个深挖方向；**再苏格拉底式 + 费曼检验**考核。薄弱点**只从考核阶段记**，不会把"还没复习"误记成弱项。
-- **系统客观评估掌握度**：`/swcc-stop` 派**独立子智能体**按「覆盖度 + 深度」打分，不靠自评；按艾宾浩斯 `[1,2,4,7,15]` 天排下次复习。
-- **越学越懂你（复利）**：`/swcc-compound` 和你聊"学得怎么样、哪里吃力、为什么"，提炼出关于**你怎么学**的档案（讲解偏好、反复盲区、有效引导），让 go/weak/mock 之后把你教得越来越贴——只调风格、不松纪律。
-- **沉淀成果**：`/swcc-blog` 把本轮学习/讨论写成可读 blog（默认存 `./blogs/`，可发布）；`/swcc-deep` 把概念横向深挖。
-- **数据是你的**：复习数据存 `~/.study-with-cc/`，独立于插件，更新不丢。
+- **Auto-generated knowledge tree**: give it a topic and it decomposes it into a structured knowledge tree + knowledge system, optionally anchored to a PDF/doc; **after generation it mandatorily dispatches reviewer sub-agents to find and fill gaps**. You can incrementally update an existing topic — **your learned progress is never lost**.
+- **Teach first, test after — starting from first principles**: `/swcc-go` walks you through the material first — for complex mechanisms it **starts from the essence / design philosophy** (giving you the right lens before the machinery), then offers several directions to dig deeper; only **then** does it quiz you Socratically + with a Feynman check. Weak points are **recorded only from the test phase**, so "not yet reviewed" is never mistaken for a weakness.
+- **Objective, system-scored mastery**: `/swcc-stop` dispatches an **independent sub-agent** that scores you on *coverage + depth* — not self-assessment — and schedules the next review on the Ebbinghaus `[1,2,4,7,15]`-day curve.
+- **It learns how you learn (the compounding part)**: `/swcc-compound` talks with you about *how it went, where you struggled, and why*, and distills a profile of **how you learn** (explanation preferences, recurring blind spots, what guidance works). go/weak/mock then teach you in an increasingly tailored way — adjusting style only, never relaxing rigor.
+- **Capture the output**: `/swcc-blog` turns a learning session/discussion into readable blog posts (saved to `./blogs/` by default, ready to publish); `/swcc-deep` expands a concept across domains.
+- **Your data is yours**: review data lives in `~/.study-with-cc/`, independent of the plugin, so updates never wipe it.
 
-## 安装
+## Install
 
 ```bash
 claude plugin marketplace add guoqiaoZhou/study-with-claude-code
 claude plugin install study-with-claude-code
 ```
 
-本地试用（不安装）：`claude --plugin-dir /path/to/study-with-claude-code`
+Try locally (without installing): `claude --plugin-dir /path/to/study-with-claude-code`
 
-## 命令（12 个）
+## Commands (12)
 
-> 不知道用哪个?直接 **`/swcc-help`** —— 它会按"我想做 X → 用哪个命令"帮你选。
+> Not sure which to use? Just run **`/swcc-help`** — it picks the right command for you based on "I want to do X → use this".
 
-**核心闭环**
+**Core loop**
 
-| 命令 | 用法 | 作用 |
+| Command | Usage | What it does |
 |------|------|------|
-| `/swcc-plan` | `[topic] [level] [--update]` | 生成/更新 roadmap 级知识树 + 知识体系（评审子智能体查漏补缺） |
-| `/swcc-go` | `[topic] [study\|test] [concept\|scenario\|mixed]` | 先讲后测：从第一性讲透 → 苏格拉底考核 |
-| `/swcc-stop` | `stop` | 结束并归档：独立子智能体评分、记薄弱点、排下次复习 |
-| `/swcc-stats` | `[topic]` | 进度快照：掌握比例、薄弱点、连续天数、统计 |
+| `/swcc-plan` | `[topic] [level] [--update]` | Generate/update a roadmap-grade knowledge tree + knowledge system (reviewer sub-agents fill gaps) |
+| `/swcc-go` | `[topic] [study\|test] [concept\|scenario\|mixed]` | Teach-then-test: teach from first principles → Socratic quiz |
+| `/swcc-stop` | `stop` | End & archive: independent sub-agent scores you, logs weak points, schedules the next review |
+| `/swcc-stats` | `[topic]` | Progress snapshot: mastery ratio, weak points, streak, stats |
 
-**日常 & 多专题**
+**Daily & multi-topic**
 
-| 命令 | 用法 | 作用 |
+| Command | Usage | What it does |
 |------|------|------|
-| `/swcc-daily` | `[topic]` | 今天该复习什么（跨专题到期汇总，只读，可定时提醒） |
-| `/swcc-switch` | `[topic]` | 多专题切换 + 总览 |
-| `/swcc-weak` | `[topic]` | 薄弱点专项强化（配 `/swcc-stop` 归档） |
+| `/swcc-daily` | `[topic]` | What to review today (cross-topic due digest, read-only, cron-friendly) |
+| `/swcc-switch` | `[topic]` | Switch between topics + overview |
+| `/swcc-weak` | `[topic]` | Drill weak points specifically (pair with `/swcc-stop` to archive) |
 
-**进阶 & 沉淀**
+**Advanced & capture**
 
-| 命令 | 用法 | 作用 |
+| Command | Usage | What it does |
 |------|------|------|
-| `/swcc-mock` | `[topic] [level]` | 模拟面试 + 独立评分报告 |
-| `/swcc-compound` | `[topic]` | 学习复盘：提炼「你怎么学」让系统更懂你 |
-| `/swcc-deep` | `[topic] [concept]` | 概念横向深挖（可选联网） |
-| `/swcc-blog` | `[拆分提示] [out:目录]` | 把本轮学习/讨论沉淀成 blog |
+| `/swcc-mock` | `[topic] [level]` | Mock interview + independently scored report |
+| `/swcc-compound` | `[topic]` | Reflect on your learning: distill "how you learn" so the system fits you better |
+| `/swcc-deep` | `[topic] [concept]` | Expand a concept across domains (optional web lookup) |
+| `/swcc-blog` | `[split hint] [out:dir]` | Turn this session/discussion into blog posts |
 
-- `level`：`p6`/`p7`/`p8`/`p9`（深度，默认 `p7`）
-- ⚠️ `go`/`weak` 与 `stop` 需在**同一轮对话**里使用——`stop` 要读本次对话来归档。
+- `level`: `p6`/`p7`/`p8`/`p9` (depth; default `p7`)
+- ⚠️ `go`/`weak` must be used in the **same conversation** as `stop` — `stop` reads the current conversation to archive it.
 
-## 典型流程
+## Typical flow
 
 ```
-/swcc-plan <主题> p7       # 建知识树（会问要不要挂 PDF/资料）
-/swcc-daily               # 每天看今天该复习啥
-/swcc-go → 答题 → /swcc-stop   # 先讲后测 → 归档评分
-/swcc-weak → /swcc-stop        # 专攻薄弱点
-/swcc-compound            # 阶段复盘，让系统更懂你
-/swcc-blog 3              # 把学到的写成 3 篇 blog
+/swcc-plan <topic> p7      # build the tree (it'll ask whether to attach a PDF/material)
+/swcc-daily               # see what's due today
+/swcc-go → answer → /swcc-stop   # teach-then-test → archive & score
+/swcc-weak → /swcc-stop          # drill your weak points
+/swcc-compound            # periodic reflection so the system fits you better
+/swcc-blog 3              # write up what you learned as 3 blog posts
 ```
 
-## 数据存储
+## Data storage
 
 ```
 ~/.study-with-cc/
-├── config.json            # 全局配置 + 专题注册表
-├── learner-profile.md     # 学习者档案（跨专题：你怎么学；compound 维护，各技能读取调风格）
+├── config.json            # global config + topic registry
+├── learner-profile.md     # learner profile (cross-topic: how you learn; maintained by compound, read by skills to tune style)
 └── topics/<topic>/
     ├── knowledge-tree.md / knowledge-system.md / progress.json / references.json
-    ├── review-sessions/   # go/weak 归档    mock-sessions/  # 模拟面试报告
-    ├── reports/           # compound 复盘   deep-notes/     # 深挖笔记
+    ├── review-sessions/   # go/weak archives    mock-sessions/  # mock interview reports
+    ├── reports/           # compound reflections deep-notes/     # deep-dive notes
 ```
 
-blog 默认写到**当前工作目录** `./blogs/`（便于发布），不在插件数据目录里。参考资料只记路径不复制；PDF 用原生分页读取（零依赖）。
+Blogs are written to your **current working directory** `./blogs/` by default (easy to publish), not inside the plugin's data dir. Reference materials are recorded by path only (not copied); PDFs are read via native paginated reading (zero dependencies).
 
 ## License
 
