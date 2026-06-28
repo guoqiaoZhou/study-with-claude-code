@@ -22,7 +22,7 @@ user-invocable: true
 ## 典型用法
 
 ```
-首次建专题：  /swcc-plan JVM p7        （可挂载《深入理解JVM》PDF）
+首次建专题：  /swcc-plan <主题> p7      （可挂载相关 PDF/资料）
 日常复习：    /swcc-go  →  答题  →  /swcc-stop
 查看进度：    /swcc-stats
 ```

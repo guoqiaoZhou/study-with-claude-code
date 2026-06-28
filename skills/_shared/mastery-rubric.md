@@ -68,9 +68,9 @@
   "mastery": 7,
   "coverage": 6,
   "depth": 8,
-  "reasons": "覆盖了 SDS/quicklist/intset 三处底层编码但漏了 ziplist→listpack 演进；原理与取舍讲得清，能举例，故深度高。",
+  "reasons": "考核覆盖了该节点约一半的核心概念；其中两处能讲清原理与取舍并举出例子，故深度评分偏高；但有一个关键机制完全没被问到，覆盖度因此中等。",
   "weakPoints": [
-    { "concept": "ziplist 与 listpack 的区别与演进", "mastery": 4 }
+    { "concept": "<考核时卡壳或只答出结论的那个具体概念>", "mastery": 4 }
   ]
 }
 ```
