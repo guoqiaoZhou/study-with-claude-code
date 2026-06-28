@@ -20,11 +20,11 @@
 
 ---
 
-## 1. swcc-notice —— 「今天该复习什么」每日提醒（最高优先，独立 skill，cron 友好）
+## 1. swcc-daily —— 「今天该复习什么」每日提醒（最高优先，独立 skill，cron 友好）
 
 **问题**:`progress.json` 里每个节点/薄弱点都有 `nextReview`,但没有任何地方主动说「今天有 N 个该复习」。用户想不起来回来 → 间隔复习失效。
 
-**对策**:做一个**专门的只读 skill `swcc-notice`**(而非塞进 stats),作为每日复习提醒入口。
+**对策**:做一个**专门的只读 skill `swcc-daily`**(而非塞进 stats),作为每日复习提醒入口。
 
 - **触发**:「今天复习什么」「该复习啥了」「复习提醒」;以及**定时触发**(用户用 `/loop` 或 cron 每天唤起,变成每日提醒)。
 - **参数**:`[topic]`(可选;默认**跨所有专题**汇总,这对每日提醒最有用)。
@@ -35,7 +35,7 @@
   3. 给**建议执行顺序**(逾期最久 / 薄弱点优先)并指向 `/swcc-weak`、`/swcc-go` 去做。
   4. 显示 `dailyGoal` 进度(今日已复习时长 / 目标分钟,从今天的 review-sessions 估)。
 - **写**:**只读,零写入** —— 正因如此才适合无人值守的定时触发。
-- **cron 友好**:无状态、只读、给定日期确定性输出。用户后续可 `CronCreate` 每天某个非整点时刻触发 `/swcc-notice`,把摘要当晨间提醒。
+- **cron 友好**:无状态、只读、给定日期确定性输出。用户后续可 `CronCreate` 每天某个非整点时刻触发 `/swcc-daily`,把摘要当晨间提醒。
 - **契约扩展**:无新结构,纯计算;需在 data-contract 写清 `due(today)` 定义与 `dailyGoal`(分钟)消费方式。
 
 **输出草案**:
@@ -52,7 +52,7 @@ jvm：到期 1
 建议:先清 jvm 逾期 5 天那条，再过 redis 两个薄弱点。
 ```
 
-> `stats` 仍可顺带显示当前专题的到期清单,但**主动浮现的家是 `swcc-notice`**。
+> `stats` 仍可顺带显示当前专题的到期清单,但**主动浮现的家是 `swcc-daily`**。
 
 ---
 
@@ -100,20 +100,20 @@ PRD 把 `list` 并入 `switch`:无参=列出+选,带参=直接切。
 
 ## 4. mock —— 模拟面试（showcase，第三做）
 
-跨节点连续追问 + 计时 + 综合评分报告。
+跨节点连续追问 + 综合评分报告（**标注建议用时，不真计时**）。
 
 - **触发**:「模拟面试」「面我一次」「mock」。
 - **参数**:`[topic]` `[level]`(默认当前专题 / p7)。
-- **题量与配比**(PRD):概念题 ×3、场景题 ×2、(可选)算法/实操题 ×1。**注意本插件是通用复习工具**,算法题只对编码类专题适用 → 由「专题类型」决定是否出(见契约扩展)。
+- **题量与配比**(PRD):概念题 ×3、场景题 ×2、(可选)算法/实操题 ×1。**注意本插件是通用复习工具**,算法/实操题**只对 `kind: coding` 专题出**(见契约扩展)。
 - **流程**:
   1. 选题篮:**偏向薄弱点 + 覆盖主干**,按 level 调难度。
-  2. 连续作答(可标注建议用时,不强制真计时)。
+  2. 连续作答,每题标注**建议用时**(5/10/20min),**不强制倒计时**。
   3. 全部答完后,**派评估子智能体**按维度打分(承袭 stop 的客观评分思路,复用/扩展 mastery-rubric → 新建 `mock-rubric.md`),生成报告。
-- **写**:新增 `topics/<slug>/mock-sessions/<时间戳>.md`(面试报告);并**回写 weakPoints**(答砸的题 → 薄弱点)、`stats`(计一次复习)。不直接改各节点 mastery(避免一次面试大改进度),只通过 weakPoints 影响后续。
+- **写(已定)**:新增 `topics/<slug>/mock-sessions/<时间戳>.md`(面试报告);**回写 weakPoints**(答砸的题 → 薄弱点)、`stats`(计一次复习);**不直接改各节点 mastery**(避免一次面试大改进度),只通过 weakPoints 影响后续。
 - **契约扩展**:
   - 新目录 `mock-sessions/`。
   - 新文件 `_shared/mock-rubric.md`(各题型评分 + 总分合成 + 报告结构)。
-  - **专题类型**:在 `config.topics[]` 或 knowledge-tree frontmatter 加 `kind: coding | conceptual`(决定是否出算法题、场景题口径)。默认 `conceptual`。
+  - **专题类型(已定)**:在 **knowledge-tree.md frontmatter** 加 `kind: coding | conceptual`(默认 `conceptual`)。决定 mock 是否出算法/实操题;plan 生成时按专题判定写入。
 - **输出**:沿用 PRD 的「🎤 模拟面试报告」(总分 + 分题型得分 + 改进建议)。
 
 ---
@@ -130,7 +130,7 @@ PRD 把 `list` 并入 `switch`:无参=列出+选,带参=直接切。
   3. **沉淀**:写到 `topics/<slug>/deep-notes/<concept>.md`,让深挖结果累积成知识资产(契合「compound」愿景)。
 - **写**:仅新增 `deep-notes/` 笔记,**不影响 mastery/progress**(纯增益)。
 - **契约扩展**:新目录 `deep-notes/`。
-- **subagent**:可选——用一个「广度」子智能体扩跨领域连接;但**不依赖联网**(默认靠模型知识 + 已挂资料),保证离线可用。
+- **联网(已定:可选联网)**:deep **默认尝试联网**(`WebSearch`/`WebFetch`)拉取跨领域/最新材料,让拓展更鲜活;**但联网不可用时回落到模型知识 + 已挂资料**,绝不因断网报错——守住「插件离线也能跑」的底线。可选再加一个「广度」子智能体扩展连接。
 
 ---
 
@@ -153,11 +153,11 @@ PRD 把 `list` 并入 `switch`:无参=列出+选,带参=直接切。
 ## 7. 健壮性 / 收尾
 
 - **专题判定优先级(定死成原则)**:`go / weak / stop / stats` 解析专题时一律按 **显式参数 > 当前对话内容 > `activeTopic`(兜底)**。尤其 `stop` 必须从**对话里实际复习的专题**归档,不认 activeTopic——这样「忘了 switch」最坏只是裸跑默认命令时考错专题(go 开头会打印当前专题,当场可见可纠),**绝不会把成绩写错专题**。这条要落到 data-contract 并在各 SKILL 复述。
-- **手动改树对账**:用户手动编辑 `knowledge-tree.md` 后,tree 与 `progress.json` 可能漂移。提供一个**对账步骤**(可做成 `plan --reconcile` 或 `stats` 启动时静默检测):按节点路径 key 比对,tree 有而 progress 无 → 补 `not_started`;progress 有而 tree 无 → 标孤儿提示。复用 data-contract 第十一节合并语义。
+- **手动改树对账(已定:stats 静默检测)**:用户手动编辑 `knowledge-tree.md` 后,tree 与 `progress.json` 可能漂移。在 **`stats` 启动时静默检测 + 提示**(不另立命令):按节点路径 key 比对,tree 有而 progress 无 → 补 `not_started`;progress 有而 tree 无 → 标孤儿提示。复用 data-contract 第十一节合并语义。
 - **`dailyGoal` 落地**:stats/switch 显示「今日已复习 X / 目标 Y 分钟」。
 - **`dir` 类参考资料**:`references.json` 的 `type: dir` 遍历策略已写但未验证,需在 plan/go 真实跑一次。
 - **大文件分块写(通用,已在 v0.3.1 落地)**:`mock`/`compound` 的长报告、以及 plan 的 `knowledge-system.md`,都**禁止一次性整文件输出**(会超时),一律按 data-contract 第十二节「先骨架后分块 Edit 追加 + TodoWrite 跟踪 + 大产物可并行起草」来写。
-- **subagent 成本观察**:plan/stop 的子智能体让 token/延迟上升,mock 又加一个。真实使用里观察是否过重,必要时给「轻量模式」开关(跳过评审)。
+- **subagent 轻量模式(暂缓)**:plan/stop/mock 的子智能体让 token/延迟上升。**先不做开关**,等真实使用的成本数据再决定是否加「跳过评审」的 fast 模式。
 
 ---
 
@@ -166,7 +166,7 @@ PRD 把 `list` 并入 `switch`:无参=列出+选,带参=直接切。
 | 步骤 | 交付 | 依赖 / 新契约 |
 |---|---|---|
 | **0** | **先验证 v0.3.0**(redis 端到端) | 无——但必须先做,别在未验证地基上叠 |
-| 1 | `swcc-notice`（每日提醒）+ `switch` | 无新结构;定义 `due(today)` + `dailyGoal` 消费 |
+| 1 | `swcc-daily`（每日提醒）+ `switch` | 无新结构;定义 `due(today)` + `dailyGoal` 消费 |
 | 2 | `weak` | 给 weakPoints 加 `consecutivePass`,stop 维护它 |
 | 3 | `mock` | `mock-sessions/`、`_shared/mock-rubric.md`、专题 `kind` |
 | 4 | `compound` | `reports/`(聚合 sessions + mock) |
@@ -185,7 +185,7 @@ PRD 把 `list` 并入 `switch`:无参=列出+选,带参=直接切。
 | `swcc-go` | ✅ v0.3.0 | 苏格拉底式逐层深挖复习 | 只读 |
 | `swcc-stop` | ✅ v0.3.0 | 独立子智能体客观评分 + 归档 | review-session/progress/tree |
 | `swcc-stats` | ✅ v0.3.0 | 即时进度快照（+ 今日到期，二期增强） | 只读 |
-| `swcc-notice` | 🔵 二期 | 「今天该复习什么」每日提醒（cron 友好） | 只读 |
+| `swcc-daily` | 🔵 二期 | 「今天该复习什么」每日提醒（cron 友好） | 只读 |
 | `swcc-switch` | 🔵 二期 | 多专题切换 + 跨专题到期仪表盘 | config.activeTopic |
 | `swcc-weak` | 🔵 二期 | 薄弱点专项强化（配 stop 归档） | 只读 |
 | `swcc-mock` | 🔵 二期 | 模拟面试 + 评分报告 | mock-sessions/progress(weakPoints) |
