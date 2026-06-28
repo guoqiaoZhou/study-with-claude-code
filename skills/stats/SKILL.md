@@ -1,6 +1,6 @@
 ---
 name: swcc-stats
-description: 展示一个专题的复习进度——掌握/学习中/未开始比例、薄弱点清单、连续复习天数和总量统计。Use this skill when the user wants to see review progress/stats/dashboard, or says "看进度"、"stats"、"复习到哪了"、"进度如何"。
+description: 展示一个专题的复习进度——掌握/学习中/未开始比例、薄弱点清单、连续复习天数和总量统计。Use this skill when the user wants to see review progress/stats/dashboard, or says "看进度"、"stats"、"复习到哪了"、"进度如何"、"还剩多少没复习".
 argument-hint: "[topic]"
 user-invocable: true
 ---
@@ -9,19 +9,29 @@ user-invocable: true
 
 只读地展示一个专题的复习进度。
 
-> 开始前先读数据契约：`${CLAUDE_PLUGIN_ROOT}/skills/_shared/data-contract.md`。本技能**只读不写**。
+> 开始前先读数据契约:`${CLAUDE_PLUGIN_ROOT}/skills/_shared/data-contract.md`。本技能**只读不写**。
 
-参数：`$ARGUMENTS` —— 可选 topic（默认用 config 的 `activeTopic`）。
+参数:`$ARGUMENTS` —— 可选 topic（默认 config 的 `activeTopic`）。
+
+---
+
+## 核心原则
+
+1. **只读，不改任何文件。**
+2. **不编数字。** 趋势/统计数据不足时如实留空或省略，绝不臆造。
+3. **最该复习的排在最前。** 薄弱点按 `nextReview` 升序，让用户一眼看到今天该补什么。
+
+---
 
 ## 流程
 
 ### 1. 加载数据
-- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`（config 不存在或缺 activeTopic 时，按数据契约第九节「兜底」扫 topics/ 自愈，不要直接报错）。
+- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`（config 不存在或缺 activeTopic 时，按数据契约第九节「兜底」扫 `topics/` 自愈，不要直接报错）。
 - 该专题不存在 → 提示先 `/swcc-plan <topic>`，停止。
 - 读 `progress.json`（必要时读 `review-sessions/` 做趋势聚合）。
 
 ### 2. 计算
-- 按 `nodes` 的 `status` 统计：mastered / in_progress / not_started 各占多少、百分比。
+- 按 `nodes` 的 `status` 统计:mastered / in_progress / not_started 各占多少、百分比。
 - `weakPoints` 按 `nextReview` 升序排列（最该复习的在前）。
 - 从 `stats` 取 streak、totalReviewCount、totalReviewTime。
 
@@ -42,4 +52,11 @@ user-invocable: true
 ⏱️ 总复习时长：<totalReviewTime> 分钟
 ```
 
-掌握度变化趋势（可选）：若 `review-sessions/` 有多份记录，可按日期聚合各节点掌握度，画一个简单的 ASCII 趋势条；数据不足时省略此段，不要编造数字。
+掌握度变化趋势（可选）:若 `review-sessions/` 有多份记录，可按日期聚合各节点掌握度，画一个简单的 ASCII 趋势条;数据不足时省略此段，不要编造数字。
+
+---
+
+## 质量基准
+
+- 比例数字和 progress.json 对得上;薄弱点按 nextReview 正确排序。
+- 数据不足的段落如实省略，不臆造趋势。

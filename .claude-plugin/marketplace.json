@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "study-with-claude-code",
-      "description": "AI 驱动的通用复习系统：建知识树、闭环复习、系统评估掌握度、按艾宾浩斯曲线安排复习。",
-      "version": "0.2.1",
+      "description": "AI 驱动的通用复习系统：roadmap 级知识树（评审子智能体 + 增量更新）、苏格拉底式闭环复习、独立子智能体评估掌握度、艾宾浩斯间隔复习。",
+      "version": "0.3.0",
       "author": {
         "name": "guoqiaoZhou"
       },

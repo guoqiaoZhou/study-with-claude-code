@@ -1,33 +1,65 @@
 ---
 name: swcc-stop
-description: 结束本次复习并归档。从当前对话提取复习内容，由系统评估掌握度（不让用户自评），记录薄弱点，更新进度并按艾宾浩斯曲线安排下次复习。Use this skill when the user wants to end/finish/archive a review session, or says "结束复习"、"stop"、"归档"、"复习完了"。
+description: 结束本次复习并归档。从当前对话提取复习内容，派独立子智能体客观评估掌握度（覆盖度 + 深度两维，不让用户自评），记录薄弱点，更新进度并按艾宾浩斯曲线安排下次复习。Use this skill when the user wants to end/finish/archive a review session, or says "结束复习"、"stop"、"归档"、"复习完了"、"今天就到这".
 user-invocable: true
 ---
 
 # swcc · stop — 结束复习并归档
 
-归档**当前这轮对话里**刚发生的复习：评分、记薄弱点、更新进度。
+归档**当前这轮对话里**刚发生的复习:**独立评分**、记薄弱点、更新进度、排下次复习。
 
-> 开始前先读数据契约：`${CLAUDE_PLUGIN_ROOT}/skills/_shared/data-contract.md`。本技能会**写**：新增一份 review-session 记录，并更新 progress.json 与 knowledge-tree.md。
+> 动手前先读两份契约:
+> - `${CLAUDE_PLUGIN_ROOT}/skills/_shared/data-contract.md` —— 落盘格式与艾宾浩斯计算。
+> - `${CLAUDE_PLUGIN_ROOT}/skills/_shared/mastery-rubric.md` —— 掌握度评分两维与档位。
+> 本技能会**写**:新增一份 review-session 记录，并更新 progress.json 与 knowledge-tree.md。
 
-## 流程
+---
 
-### 1. 提取本次复习内容
-从**当前对话历史**回顾本次（通常由 `/swcc-go` 发起的）复习：
-- 复习了哪个专题、哪个节点路径；
-- 问了哪些题、用户怎么答的、哪里答得好 / 哪里卡壳或答错。
+## 核心原则
 
-若无法从对话中找到本次复习内容（比如没先 `/swcc-go`），告诉用户「本轮对话没有可归档的复习」，停止。
+1. **掌握度由系统独立评估，绝不让用户自评。** 用一个没参与对话的子智能体打分，避开「考官心软」偏差。
+2. **覆盖度 + 深度两维并重。** 会背（覆盖广但浅）和钻牛角尖（深但窄）都不算掌握，见 mastery-rubric。
+3. **进度只增不乱。** 严格按 data-contract 更新 progress，艾宾浩斯算 nextReview，状态机别跳。
+4. **评分要有理由。** review-session 必须写清「覆盖了什么、深度如何、缺什么」。
 
-### 2. 系统评估掌握度（不让用户自评）
-**掌握度（1–10）完全由你根据用户在本次对话中的表现评估**，主要参考两个维度：
-1. **知识面覆盖度** —— 本次实际触及该节点多少关键概念（覆盖全 vs 只碰到一角）。
-2. **回答深度** —— 用户是停留在背诵/罗列，还是讲清了原理、设计取舍、边界条件、能举例。
+---
 
-给出分数的同时，**写明评分理由**（覆盖了什么、深度如何、缺什么）。不要询问用户自评。
+## 执行流程
 
-### 3. 写复习记录
-在 `$HOME/.study-with-cc/topics/<slug>/review-sessions/` 下新建 `<时间戳>.md`（时间戳用 `date +%Y-%m-%d-%H-%M-%S`）：
+| 阶段 | 名称 | 目的 |
+|---|---|---|
+| 1 | 提取本次复习 | 从对话（含 go 收尾小结）整理事实 |
+| 2 | **独立子智能体评分** | 客观给 coverage/depth/mastery |
+| 3 | 写复习记录 | review-sessions/<时间戳>.md |
+| 4 | 更新 progress.json | status/mastery/nextReview/weakPoints/stats |
+| 5 | 更新 knowledge-tree.md | 勾选已掌握、标薄弱点 |
+| 6 | 输出摘要 | 掌握度 + 理由 + 下次复习 |
+
+---
+
+### 阶段 1：提取本次复习内容
+
+从**当前对话历史**回顾本次（通常由 `/swcc-go` 发起的）复习，整理出事实清单:
+- 复习了哪个专题、哪个节点路径、什么 mode;
+- 该节点的核心概念清单（从 knowledge-system.md 取）;
+- 问了哪些题、用户怎么答、哪里答得好 / 哪里卡壳或答错;
+- 若 go 输出过「收尾小结」，把它一并纳入。
+
+若对话里找不到本次复习内容（比如没先 `/swcc-go`），告诉用户「本轮对话没有可归档的复习」，停止。
+
+### 阶段 2：派独立子智能体评估掌握度（不让用户自评）
+
+**这是客观性的关键，必做。** 用 **Agent 工具派一个评估子智能体**，把阶段 1 整理的事实清单 + `mastery-rubric.md` 的评分规则交给它，要求它**只评估、不写文件**，按 rubric 第五节返回 JSON:
+
+```json
+{ "mastery": 7, "coverage": 6, "depth": 8, "reasons": "…", "weakPoints": [ { "concept": "…", "mastery": 4 } ] }
+```
+
+> 提醒（原则 1）:你是本轮考官，不要自己拍脑袋打分;以子智能体的客观结果为准。若结果明显不合常理可复核一次，但默认采信。
+
+### 阶段 3：写复习记录
+
+在 `$HOME/.study-with-cc/topics/<slug>/review-sessions/` 下新建 `<时间戳>.md`（时间戳用 `date +%Y-%m-%d-%H-%M-%S`）:
 
 ```markdown
 # 复习记录：<YYYY-MM-DD HH:mm>
@@ -36,10 +68,10 @@ user-invocable: true
 - 专题：<topic>
 - 节点路径：<节点路径>
 - 模式：<mode>
-- 掌握度（系统评估）：<n>/10
+- 掌握度（系统评估）：<mastery>/10（覆盖度 <coverage> / 深度 <depth>）
 
 ## 评分理由
-<覆盖度 + 深度的具体说明>
+<子智能体的 reasons：覆盖了什么、深度如何、缺什么>
 
 ## 复习内容
 - 问题 1：…（回答要点 / 点评）
@@ -52,22 +84,33 @@ user-invocable: true
 - <YYYY-MM-DD> 复习：<重点>
 ```
 
-### 4. 更新 progress.json
-- 目标节点：更新 `status`（mastery ≥ 8 → `mastered`，否则 `in_progress`）、`mastery`、`lastReviewed`（今天，`date +%F`）、`reviewCount += 1`、按艾宾浩斯（数据契约第六节）算 `nextReview`。
-- **薄弱点**：本次卡壳/答错/掌握度低（< 6）的具体点，写入 `weakPoints`（含 node/concept/mastery/createdAt/nextReview/reviewCount）。若某薄弱点本次掌握度 ≥ 8 且此前已达标一次，则移除它。
-- `stats`：`totalReviewCount += 1`；`totalReviewTime` 加上本次估算时长（分钟，可据对话规模估）；更新 `streak`（若 `lastReviewDate` 是昨天则 +1，是今天则不变，否则重置为 1）；`lastReviewDate` = 今天。
-- 若需要把 `currentNode` 推进到下一个 `not_started` 节点，则更新它。
+### 阶段 4：更新 progress.json
 
-### 5. 更新 knowledge-tree.md
-- 若目标节点已 `mastered` → 把对应行的 `- [ ]` 改成 `- [x]`。
-- 若新产生薄弱点 → 对应行尾加 `🔴`（已是薄弱点则保持）。
+- 目标节点:`status`（mastery ≥ 8 → `mastered`，否则 `in_progress`）、`mastery`、`lastReviewed`=今天（`date +%F`）、`reviewCount += 1`、按艾宾浩斯（data-contract 第六节）算 `nextReview`。
+- **薄弱点**:子智能体返回的 `weakPoints` + 本次卡壳/答错/掌握度低（< 6）的具体点，写入 `weakPoints`（含 node/concept/mastery/createdAt/nextReview/reviewCount）。若某薄弱点本次 mastery ≥ 8 且此前已达标一次，则移除它（连续两次达标才移除）。
+- `stats`:`totalReviewCount += 1`;`totalReviewTime` 加本次估算时长（分钟，据对话规模估）;`streak`（`lastReviewDate` 是昨天则 +1，今天则不变，否则重置 1）;`lastReviewDate`=今天。
+- 视情况把 `currentNode` 推进到下一个 `not_started` 节点。
 
-### 6. 输出摘要
+### 阶段 5：更新 knowledge-tree.md
+
+- 目标节点已 `mastered` → 对应行 `- [ ]` 改 `- [x]`。
+- 新产生薄弱点 → 对应行尾加 `🔴`（已有则保持）;若某行薄弱点已清除则去掉 `🔴`。
+
+### 阶段 6：输出摘要
+
 ```
 ✅ 复习已归档
-📊 掌握度（系统评估）：<n>/10 —— <一句话理由>
+📊 掌握度（系统评估）：<mastery>/10（覆盖 <coverage> / 深度 <depth>）—— <一句话理由>
 🔴 新增薄弱点：<列表，或「无」>
 📅 下次复习：<YYYY-MM-DD>
 🔥 连续复习：<streak> 天
 📁 记录：~/.study-with-cc/topics/<slug>/review-sessions/<时间戳>.md
 ```
+
+---
+
+## 质量基准（达到才算归档完成）
+
+- 掌握度来自**独立子智能体**，不是主对话自评;review-session 里有可追溯的评分理由。
+- progress.json 的 mastery/status/nextReview/weakPoints/stats 全部按 rubric 与 data-contract 更新一致。
+- knowledge-tree.md 的勾选与 🔴 标记和 progress 对得上。
