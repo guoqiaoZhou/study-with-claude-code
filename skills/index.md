@@ -34,6 +34,7 @@ user-invocable: true
 | mock | `/swcc-mock [topic] [level]` | 模拟面试：跨节点连续出题 + 独立子智能体评分报告（偏向薄弱点） |
 | compound | `/swcc-compound [topic]` | 阶段沉淀报告：聚合历次记录看趋势，写入 reports/ |
 | deep | `/swcc-deep [topic] [concept]` | 概念深挖：跨领域连接/类比/对比/延伸（可选联网），沉淀 deep-notes/ |
+| blog | `/swcc-blog [拆分提示] [out:目录]` | 把本轮学习/讨论沉淀成可读 blog 文章（默认写到 ./blogs/，可发布） |
 
 ## 典型用法
 
@@ -44,6 +45,7 @@ user-invocable: true
 攻克弱项：    /swcc-weak  →  答题  →  /swcc-stop
 查看进度：    /swcc-stats　切换专题：/swcc-switch
 模拟面试：    /swcc-mock　阶段报告：/swcc-compound　深挖概念：/swcc-deep <concept>
+沉淀成文：    /swcc-blog               （把本轮学习/讨论写成 blog，存 ./blogs/）
 ```
 
 ## 数据位置
