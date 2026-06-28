@@ -10,7 +10,7 @@
     {
       "name": "study-with-claude-code",
       "description": "AI 驱动的通用复习系统：roadmap 级知识树（评审子智能体 + 增量更新）、苏格拉底式闭环复习、独立子智能体评估掌握度、艾宾浩斯间隔复习。",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "author": {
         "name": "guoqiaoZhou"
       },
