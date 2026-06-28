@@ -13,7 +13,7 @@ user-invocable: true
 | 技能 | 调用 | 作用 |
 |---|---|---|
 | plan | `/swcc-plan [topic] [level] [--update]` | 生成 roadmap 级知识树 + 知识体系（可挂 PDF/文档），生成后用评审子智能体查漏补缺;对已有专题可增量更新、保留进度 |
-| go | `/swcc-go [topic] [mode]` | 开始复习：定位知识点，围绕核心概念清单苏格拉底式逐层深挖（优先到期薄弱点） |
+| go | `/swcc-go [topic] [mode]` | 开始复习：先带你过一遍知识点，再苏格拉底式考核（先讲后测；优先到期薄弱点） |
 | stop | `/swcc-stop` | 结束并归档：独立子智能体客观评估掌握度、记薄弱点、更新进度 |
 | stats | `/swcc-stats [topic]` | 看进度：掌握比例、薄弱点、连续天数、统计 |
 
