@@ -213,6 +213,12 @@ createdAt: 2026-06-28
 - `topics[]`：所有已建专题。plan 新建专题时追加一条并把 activeTopic 指向它。
 - 首次运行（文件不存在）时由 plan 创建该文件。
 
+**兜底（重要）**：任何技能若发现 `config.json` 不存在或缺 `activeTopic`，应**自愈**而不是报错退出：
+1. 扫描 `$HOME/.study-with-cc/topics/` 下的子目录，得到已有专题列表（每个子目录名即 slug）。
+2. 只有一个专题 → 直接用它，并就地补建/补全 `config.json`（activeTopic 指向它、topics[] 补上该条）。
+3. 有多个 → 列出来让用户指定要用哪个，然后补全 config.json。
+4. 一个都没有 → 提示用户先 `/swcc-plan <topic>`。
+
 ---
 
 ## 十、复习模式（mode）

@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "study-with-claude-code",
   "displayName": "Study with Claude Code",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AI 驱动的通用复习系统：建知识树、闭环复习、系统评估掌握度、按艾宾浩斯曲线安排复习。A general-purpose spaced-repetition review system as Claude Code skills.",
   "author": {
     "name": "guoqiaoZhou",

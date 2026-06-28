@@ -16,7 +16,7 @@ user-invocable: true
 ## 流程
 
 ### 1. 加载数据
-- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`。
+- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`（config 不存在或缺 activeTopic 时，按数据契约第九节「兜底」扫 topics/ 自愈，不要直接报错）。
 - 该专题不存在 → 提示先 `/swcc-plan <topic>`，停止。
 - 读 `progress.json`（必要时读 `review-sessions/` 做趋势聚合）。
 

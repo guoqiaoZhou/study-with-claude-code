@@ -16,7 +16,7 @@ user-invocable: true
 ## 流程
 
 ### 1. 解析参数 & 加载专题
-- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`。
+- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`（config 不存在或缺 activeTopic 时，按数据契约第九节「兜底」扫 topics/ 自愈，不要直接报错）。
 - 若该专题不存在 → 提示用户先用 `/swcc-plan <topic>` 建知识树，停止。
 - 读该专题的 `progress.json`、`knowledge-tree.md`、`knowledge-system.md`、`references.json`。
 

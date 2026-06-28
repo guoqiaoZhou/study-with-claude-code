@@ -29,24 +29,39 @@ user-invocable: true
   - PDF：用 Read 读**目录页/前 10 页**提取章节结构，作为知识分解的主要依据。
   - 目录：列出结构，挑相关文件。
   - docx 等：按契约做 best-effort 转换。
-- **无** → `references` 为空数组，纯靠你自身理解生成。
+- **无** → `references` 为空数组，纯靠你自身理解生成。**此时 knowledge-system.md 里不要假称「依据某某书」**——没有挂资料就别编来源。
 
 ### 4. 分解知识树
 把专题分解为 **3–5 个子主题**，每个子主题再分解为 **3–5 个核心概念/子节点**（可有更深层级）。
 - 按 level 校准深度：p6 基础、p7 进阶、p8/p9 专家（更多冷门点、源码级、调优排查）。
 - **若挂了参考资料**：知识树的章节结构与内容**以资料为主、结合你的理解补全**，不要脱离资料另起炉灶。
 
-### 5. 写文件（到 `$HOME/.study-with-cc/topics/<slug>/`）
-按数据契约格式分别生成：
-1. `knowledge-tree.md` —— YAML frontmatter（topic/slug/version/level/createdAt，createdAt 用 `date +%F`）+ 嵌套 checkbox，**所有节点初始为 `- [ ]`**。
-2. `knowledge-system.md` —— 每个叶子节点的「核心概念」+「面试考察点」。
-3. `progress.json` —— 为**每个叶子节点**建一条记录，全部 `status: not_started`、`mastery: 0`；`currentNode` 设为第一个叶子节点；weakPoints 空；stats 全 0。
-4. `references.json` —— 第 3 步收集的资料清单（无则 `{"references": []}`）。
-5. `config.json`（在 `$HOME/.study-with-cc/`）—— 若不存在则创建；把本专题追加进 `topics[]` 并把 `activeTopic` 设为本 slug。
+### 5. 写文件 —— 必须生成 5 样，缺一不可
 
-> 节点路径 key 必须和 knowledge-tree.md 的层级一致（见数据契约第二节）。创建目录用 `mkdir -p`。
+⚠️ 经验教训：以往执行常漏写 `config.json` 和 `references.json`。**这两个最容易漏，请最先处理。** 一律用 `mkdir -p` 确保目录存在。
 
-### 6. 输出摘要
+按数据契约格式生成（注意各文件所在目录）：
+
+| # | 文件 | 位置 | 要点 |
+|---|------|------|------|
+| 1 | `config.json` | `$HOME/.study-with-cc/`（**全局根**，不在 topic 目录） | 若文件已存在：**读出 → 追加本 topic 到 `topics[]` → `activeTopic` 设为本 slug → 写回**（不要覆盖掉别的 topic）。不存在则按数据契约第九节新建。 |
+| 2 | `references.json` | topic 目录 | 第 3 步收集的资料清单；无资料则写 `{"references": []}`。**即使为空也必须创建这个文件。** |
+| 3 | `knowledge-tree.md` | topic 目录 | YAML frontmatter（topic/slug/version/level/createdAt，createdAt 用 `date +%F`）+ 嵌套 checkbox，所有节点初始 `- [ ]`。 |
+| 4 | `knowledge-system.md` | topic 目录 | 每个叶子节点的「核心概念」+「面试考察点」。 |
+| 5 | `progress.json` | topic 目录 | 为**每个叶子节点**建一条，全部 `not_started`/`mastery:0`；`currentNode` = 第一个叶子节点；weakPoints 空；stats 全 0。节点 key 必须与 knowledge-tree.md 层级完全一致（数据契约第二节）。 |
+
+### 6. 完成前自检（必做）
+用一条命令确认 5 个文件都落盘了，缺哪个补哪个：
+```
+ls -1 "$HOME/.study-with-cc/config.json" \
+      "$HOME/.study-with-cc/topics/<slug>/references.json" \
+      "$HOME/.study-with-cc/topics/<slug>/knowledge-tree.md" \
+      "$HOME/.study-with-cc/topics/<slug>/knowledge-system.md" \
+      "$HOME/.study-with-cc/topics/<slug>/progress.json"
+```
+再确认 `config.json` 的 `activeTopic` 已指向本 slug、`topics[]` 含本条目。任一缺失/不符立即补写，然后才进入第 7 步。
+
+### 7. 输出摘要
 ```
 ✅ 知识树已生成：<topic>（level: <level>）
 📊 节点数：<叶子节点总数>　子主题：<N>
