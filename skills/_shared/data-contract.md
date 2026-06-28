@@ -306,3 +306,15 @@ go 的 `mode` 含两层:
 5. **大专题可并行起草**:子主题很多时，用 Agent 工具**并行派起草子智能体**，每个只负责**一个子主题**、**只返回该子主题的 markdown 文本、不写文件**（避免并发写同一文件冲突）；主体拿到各段后仍按第 3 步**逐块 Edit 追加**（追加本身是串行、有界的）。
 
 **适用面**:本协议对**任何大文件写入**通用——`progress.json` 节点很多时同理可分批构造；`compound`/`mock` 的长报告也按此分块。判断标准:**预计输出会很长，就先骨架后分块，配 TodoWrite 跟踪。**
+
+---
+
+## 十三、到期判定 due(today) 与 dailyGoal（daily / switch / stats 共用）
+
+**`due(today)`**:某专题里所有满足 `nextReview ≤ 今天(date +%F)` 的**节点** + **薄弱点**。`nextReview` 为 `null`（从未复习）的节点**不算到期**——它属于"未开始"，不是"该复习了"。逾期天数 = 今天 − `nextReview`（≥0）。
+
+**跨专题汇总**:遍历 `config.topics[]`，逐个读其 `progress.json` 收集 `due(today)`。排序按 `nextReview` 升序（逾期最久的在前）。
+
+**`dailyGoal`**（`config.reviewSettings.dailyGoal`，单位分钟）:今日已复习时长 = 今天日期的所有 `review-sessions/` / `mock-sessions/` 记录里 `totalReviewTime` 估值之和（或从 `stats` 近似）。展示为「已复习 X / 目标 Y 分钟」。数据不足就只显示目标、不编已复习值。
+
+> 这三处都是**只读计算**，不写任何文件。
