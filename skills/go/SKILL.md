@@ -1,6 +1,6 @@
 ---
 name: swcc-go
-description: 开始一次专题复习。自动定位当前该复习的知识点，先带用户把该节点的核心概念过一遍（讲透、点出易忽略的细节、可按需深挖），再用苏格拉底式追问考核，验证是否真懂。Use this skill when the user wants to start reviewing, studying, learning, drilling, or practicing a topic, or says "开始复习"、"go"、"复习一下 JVM"、"过一遍 Redis"、"带我学学"、"考考我".
+description: Use when the user wants to start reviewing, studying, or practicing a topic in the current conversation. 触发:「开始复习」「go」「复习一下 X」「过一遍 X」「考考我」「带我学学」。
 argument-hint: "[topic] [study|test] [concept|scenario|mixed]"
 user-invocable: true
 ---

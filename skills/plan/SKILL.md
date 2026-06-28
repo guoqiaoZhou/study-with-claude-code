@@ -1,6 +1,6 @@
 ---
 name: swcc-plan
-description: 为一个技术专题生成 roadmap 级的结构化知识树与复习材料（知识树骨架 + 详细知识体系 + 进度初始化），可结合 PDF/文档/资料目录作为依据，并对已存在的专题做增量更新。生成后强制用评审子智能体查漏补缺，保证深度与覆盖度。Use this skill when the user wants to start preparing a new topic, build a knowledge tree, plan a study/review roadmap, update/expand an existing topic's tree, or says things like "复习 JVM"、"plan JVM"、"准备面试 Redis"、"给我搭个 Kafka 知识树"、"更新一下 Redis 的知识树"、"把这个专题再补全点".
+description: Use when the user wants to prepare or review a new technical topic, build or expand a structured knowledge tree / study roadmap for a subject, or update an existing topic's tree. 触发例:「复习 X」「准备面试 X」「给我搭个 X 知识树」「plan X」「更新 X 的知识树」「把这个专题补全点」。
 argument-hint: "[topic] [level] [--update|--regenerate]"
 user-invocable: true
 ---

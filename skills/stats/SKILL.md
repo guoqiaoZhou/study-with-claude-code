@@ -1,6 +1,6 @@
 ---
 name: swcc-stats
-description: 展示一个专题的复习进度——掌握/学习中/未开始比例、薄弱点清单、连续复习天数和总量统计。Use this skill when the user wants to see review progress/stats/dashboard, or says "看进度"、"stats"、"复习到哪了"、"进度如何"、"还剩多少没复习".
+description: Use when the user wants to see a topic's review progress or dashboard. 触发:「看进度」「stats」「复习到哪了」「进度如何」「还剩多少没复习」。
 argument-hint: "[topic]"
 user-invocable: true
 ---

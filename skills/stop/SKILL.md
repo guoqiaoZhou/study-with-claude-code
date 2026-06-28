@@ -1,6 +1,6 @@
 ---
 name: swcc-stop
-description: 结束本次复习并归档。从当前对话提取复习内容，派独立子智能体客观评估掌握度（覆盖度 + 深度两维，不让用户自评），记录薄弱点，更新进度并按艾宾浩斯曲线安排下次复习。Use this skill when the user wants to end/finish/archive a review session, or says "结束复习"、"stop"、"归档"、"复习完了"、"今天就到这".
+description: Use when the user wants to end and archive the current review session — must be the same conversation as the go/weak session it closes. 触发:「结束复习」「stop」「归档」「复习完了」「今天就到这」。
 user-invocable: true
 ---
 
