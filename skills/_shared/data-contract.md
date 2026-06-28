@@ -136,7 +136,8 @@ createdAt: 2026-06-28
       "mastery": 4,
       "createdAt": "2026-06-28",
       "nextReview": "2026-06-29",
-      "reviewCount": 0
+      "reviewCount": 0,
+      "consecutivePass": 0
     }
   ],
   "stats": {
@@ -152,8 +153,9 @@ createdAt: 2026-06-28
 - `nodes` 的 key = 节点层级路径（见第二节）。plan 初始化时为每个**叶子节点**建一条，全部 `not_started` / `mastery: 0`。
 - `status`：`not_started` → `in_progress` → `mastered`（mastery ≥ 8 时转 mastered）。
 - `mastery`：0–10，**完全由系统评估**（见 stop 的评分规则），不是用户自评。
-- `currentNode`：当前/下一个该复习的节点路径，go 用它定位。
-- `weakPoints`：卡壳/低掌握的具体点，由 stop 写入；`mastery ≥ 8` 且连续两次达标后移除。
+- `currentNode`：当前/下一个该复习的节点路径，go 用它定位。**推进规则**:节点本次 `mastery ≥ 8` → 推进到下一个 `not_started` 叶子(先同子主题、再下个子主题);`mastery < 8` → 保持该节点;用户明确要求换下一个 → 推进但该节点保持 `in_progress`。
+- `weakPoints`：考核阶段卡壳/低掌握的具体点，由 stop 写入。**两个独立计数,别混用**:`reviewCount` = 该薄弱点被复习过几次(用于艾宾浩斯间隔);`consecutivePass` = 连续达标次数(考核 `mastery ≥ 8` 则 +1、否则归 0)。**`consecutivePass ≥ 2` 时移除该薄弱点。**
+- `stats.streak`：**全局**(跨所有专题)连续复习天数,不是按专题。`lastReviewDate` = 昨天 → +1;= 今天 → 不变(今天已复习过);否则 → 重置为 1。
 - 日期一律 `YYYY-MM-DD`；时间戳 `YYYY-MM-DD-HH-mm-ss`。`totalReviewTime` 单位为分钟。
 
 ---
@@ -162,7 +164,12 @@ createdAt: 2026-06-28
 
 默认间隔数组 `[1, 2, 4, 7, 15]`（天），取自 config 的 `reviewSettings.weakReviewInterval`。
 
-计算 `nextReview`：以本次复习日期为基准，按该节点（或薄弱点）**复习后的 reviewCount** 取间隔数组第 `min(reviewCount, len-1)` 个（reviewCount 从 1 开始计）。例：第 1 次复习后 +1 天，第 2 次 +2 天，第 3 次 +4 天……第 5 次及以后 +15 天。
+计算 `nextReview`：以本次复习日期为基准，取间隔数组第 `min(reviewCount, len-1)` 个（reviewCount 从 1 开始计）。例：第 1 次复习后 +1 天，第 2 次 +2 天，第 3 次 +4 天……第 5 次及以后 +15 天。
+
+**用谁的 reviewCount**:
+- **节点**的 `nextReview` → 用**该节点**本次复习后的 `reviewCount`。
+- **薄弱点**的 `nextReview` → 用**该薄弱点自身**的 `reviewCount`。
+- 二者独立计数,不要互相套用。
 
 > 当前日期从 shell 取：`date +%F`（本地时区）。skill 内不要臆造日期。
 
