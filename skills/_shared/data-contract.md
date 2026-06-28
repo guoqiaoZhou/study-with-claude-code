@@ -6,12 +6,12 @@
 
 ## 一、存储位置
 
-所有用户的复习数据存在**全局目录** `~/.in-prep/`（在 shell 里展开为 `$HOME/.in-prep`）。
+所有用户的复习数据存在**全局目录** `~/.study-with-cc/`（在 shell 里展开为 `$HOME/.study-with-cc`）。
 
-**为什么放全局**：插件本体安装在 `~/.claude/plugins/cache/` 下，插件更新时该目录会被覆盖。用户数据绝不能放插件目录内，否则一更新就丢。`~/.in-prep/` 独立于插件，持久保存。
+**为什么放全局**：插件本体安装在 `~/.claude/plugins/cache/` 下，插件更新时该目录会被覆盖。用户数据绝不能放插件目录内，否则一更新就丢。`~/.study-with-cc/` 独立于插件，持久保存。
 
 ```
-~/.in-prep/
+~/.study-with-cc/
 ├── config.json                          # 全局配置 + 专题注册表
 └── topics/<topic>/                      # 每个专题一个目录，<topic> 为小写 kebab-case
     ├── knowledge-tree.md                # 结构骨架：YAML frontmatter + 嵌套 checkbox

@@ -1,10 +1,10 @@
 ---
-name: stop
+name: swcc-stop
 description: 结束本次复习并归档。从当前对话提取复习内容，由系统评估掌握度（不让用户自评），记录薄弱点，更新进度并按艾宾浩斯曲线安排下次复习。Use this skill when the user wants to end/finish/archive a review session, or says "结束复习"、"stop"、"归档"、"复习完了"。
 user-invocable: true
 ---
 
-# in-prep · stop — 结束复习并归档
+# swcc · stop — 结束复习并归档
 
 归档**当前这轮对话里**刚发生的复习：评分、记薄弱点、更新进度。
 
@@ -13,11 +13,11 @@ user-invocable: true
 ## 流程
 
 ### 1. 提取本次复习内容
-从**当前对话历史**回顾本次（通常由 `/go` 发起的）复习：
+从**当前对话历史**回顾本次（通常由 `/swcc-go` 发起的）复习：
 - 复习了哪个专题、哪个节点路径；
 - 问了哪些题、用户怎么答的、哪里答得好 / 哪里卡壳或答错。
 
-若无法从对话中找到本次复习内容（比如没先 `/go`），告诉用户「本轮对话没有可归档的复习」，停止。
+若无法从对话中找到本次复习内容（比如没先 `/swcc-go`），告诉用户「本轮对话没有可归档的复习」，停止。
 
 ### 2. 系统评估掌握度（不让用户自评）
 **掌握度（1–10）完全由你根据用户在本次对话中的表现评估**，主要参考两个维度：
@@ -27,7 +27,7 @@ user-invocable: true
 给出分数的同时，**写明评分理由**（覆盖了什么、深度如何、缺什么）。不要询问用户自评。
 
 ### 3. 写复习记录
-在 `$HOME/.in-prep/topics/<slug>/review-sessions/` 下新建 `<时间戳>.md`（时间戳用 `date +%Y-%m-%d-%H-%M-%S`）：
+在 `$HOME/.study-with-cc/topics/<slug>/review-sessions/` 下新建 `<时间戳>.md`（时间戳用 `date +%Y-%m-%d-%H-%M-%S`）：
 
 ```markdown
 # 复习记录：<YYYY-MM-DD HH:mm>
@@ -69,5 +69,5 @@ user-invocable: true
 🔴 新增薄弱点：<列表，或「无」>
 📅 下次复习：<YYYY-MM-DD>
 🔥 连续复习：<streak> 天
-📁 记录：~/.in-prep/topics/<slug>/review-sessions/<时间戳>.md
+📁 记录：~/.study-with-cc/topics/<slug>/review-sessions/<时间戳>.md
 ```

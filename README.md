@@ -8,14 +8,14 @@
 
 ```
 建知识树  →  逐题复习  →  系统评估掌握度 + 记薄弱点  →  到期自动提醒复习
-  /plan         /go              /stop                       /stats
+  /swcc-plan         /swcc-go              /swcc-stop                       /swcc-stats
 ```
 
 - **知识树自动生成**：给个专题（如 JVM），自动拆成结构化知识树 + 知识体系文档，可挂载 PDF/文档作为依据。
-- **闭环复习**：`/go` 自动定位到当前该复习的点（优先到期薄弱点），逐题考核并点评。
-- **系统评估掌握度**：`/stop` 由 AI 按「知识面覆盖度 + 回答深度」打分，不靠自评；自动记录薄弱点。
+- **闭环复习**：`/swcc-go` 自动定位到当前该复习的点（优先到期薄弱点），逐题考核并点评。
+- **系统评估掌握度**：`/swcc-stop` 由 AI 按「知识面覆盖度 + 回答深度」打分，不靠自评；自动记录薄弱点。
 - **间隔复习**：按艾宾浩斯曲线 `[1,2,4,7,15]` 天安排下次复习。
-- **数据是你的**：所有复习数据存在 `~/.in-prep/`，独立于插件，更新插件不会丢。
+- **数据是你的**：所有复习数据存在 `~/.study-with-cc/`，独立于插件，更新插件不会丢。
 
 ## 安装
 
@@ -37,10 +37,10 @@ claude --plugin-dir /path/to/study-with-claude-code
 
 | 命令 | 用法 | 作用 |
 |------|------|------|
-| `/study-with-claude-code:plan` | `plan [topic] [level]` | 生成专题知识树 + 知识体系，可挂载参考资料 |
-| `/study-with-claude-code:go` | `go [topic] [mode]` | 开始复习，自动定位知识点逐题考核 |
-| `/study-with-claude-code:stop` | `stop` | 结束并归档，系统评估掌握度、记薄弱点、排下次复习 |
-| `/study-with-claude-code:stats` | `stats [topic]` | 查看进度：掌握比例、薄弱点、连续天数、统计 |
+| `/swcc-plan` | `plan [topic] [level]` | 生成专题知识树 + 知识体系，可挂载参考资料 |
+| `/swcc-go` | `go [topic] [mode]` | 开始复习，自动定位知识点逐题考核 |
+| `/swcc-stop` | `stop` | 结束并归档，系统评估掌握度、记薄弱点、排下次复习 |
+| `/swcc-stats` | `stats [topic]` | 查看进度：掌握比例、薄弱点、连续天数、统计 |
 
 - `level`：`p6`/`p7`/`p8`/`p9`（深度，默认 `p7`）
 - `mode`：`concept`/`scenario`/`mixed`（复习模式，默认 `mixed`）
@@ -49,16 +49,16 @@ claude --plugin-dir /path/to/study-with-claude-code
 ## 典型流程
 
 ```
-/plan JVM p7          # 建 JVM 知识树（会问你要不要挂《深入理解JVM》PDF）
-/go                   # 开始复习 → 答题 → AI 点评
-/stop                 # 归档，自动评分 + 记薄弱点 + 排下次复习
-/stats                # 看进度
+/swcc-plan JVM p7          # 建 JVM 知识树（会问你要不要挂《深入理解JVM》PDF）
+/swcc-go                   # 开始复习 → 答题 → AI 点评
+/swcc-stop                 # 归档，自动评分 + 记薄弱点 + 排下次复习
+/swcc-stats                # 看进度
 ```
 
 ## 数据存储
 
 ```
-~/.in-prep/
+~/.study-with-cc/
 ├── config.json                       # 全局配置 + 专题注册表
 └── topics/<topic>/
     ├── knowledge-tree.md             # 知识树骨架（嵌套 checkbox）

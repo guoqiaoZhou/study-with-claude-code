@@ -1,11 +1,11 @@
 ---
-name: stats
+name: swcc-stats
 description: 展示一个专题的复习进度——掌握/学习中/未开始比例、薄弱点清单、连续复习天数和总量统计。Use this skill when the user wants to see review progress/stats/dashboard, or says "看进度"、"stats"、"复习到哪了"、"进度如何"。
 argument-hint: "[topic]"
 user-invocable: true
 ---
 
-# in-prep · stats — 复习进度展示
+# swcc · stats — 复习进度展示
 
 只读地展示一个专题的复习进度。
 
@@ -16,8 +16,8 @@ user-invocable: true
 ## 流程
 
 ### 1. 加载数据
-- topic 缺省 → 读 `$HOME/.in-prep/config.json` 的 `activeTopic`。
-- 该专题不存在 → 提示先 `/plan <topic>`，停止。
+- topic 缺省 → 读 `$HOME/.study-with-cc/config.json` 的 `activeTopic`。
+- 该专题不存在 → 提示先 `/swcc-plan <topic>`，停止。
 - 读 `progress.json`（必要时读 `review-sessions/` 做趋势聚合）。
 
 ### 2. 计算

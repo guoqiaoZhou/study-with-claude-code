@@ -7,5 +7,5 @@ Thumbs.db
 .vscode/
 *.swp
 
-# 用户复习数据不属于插件仓库（存在 ~/.in-prep/）
-.in-prep/
+# 用户复习数据不属于插件仓库（存在 ~/.study-with-cc/）
+.study-with-cc/
