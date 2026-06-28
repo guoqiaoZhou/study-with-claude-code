@@ -1,6 +1,6 @@
 ---
 name: swcc-stop
-description: Use when the user wants to end and archive the current review session — must be the same conversation as the go/weak session it closes. 触发:「结束复习」「stop」「归档」「复习完了」「今天就到这」「收工」「收尾」「存一下进度」「记一下今天的」「先到这」「done」「完事了」。
+description: Use when the user wants to end the current review session — must be the same conversation as the go/weak session it closes. 触发:「结束复习」「stop」「归档」「复习完了」「今天就到这」「收工」「收尾」「存一下进度」「记一下今天的」「先到这」「done」「完事了」。
 user-invocable: true
 ---
 
@@ -73,7 +73,7 @@ user-invocable: true
 
 > **关键:区分「讲解阶段」与「考核阶段」。** go 默认先讲后测——**评分与薄弱点只看考核阶段**的表现。光在讲解阶段过了一遍、还没考的概念**不算薄弱点**(用户只是刚复习,不是不会);只有「讲过/复习过、考核时仍卡壳或答浅」的才记薄弱点。整理事实时把这两类分清,交给阶段 2 的评估子智能体。
 >
-> **怎么区分两阶段**:① go 是 `test` 取向 → 全程算考核;② `study` 取向 → 找 go 输出里「开始考你 / 接下来考核」之类过渡标志,之后算考核;③ 没有明确标志 → 把「用户作答 + 你点评对错」的往返算考核,纯单向讲解算讲解。
+> **怎么区分两阶段(按可靠性从高到低)**:① **找 go 输出的硬分界标记 `--- 考核开始 ---`**——它**之后**算考核、之前算讲解,这是**首选且最可靠**的依据;② 有 go 收尾小结的「考核结果」表 → 直接以该表为考核事实来源(每行的「表现」=扎实/答浅/卡壳);③ 都没有(go 没走完或漏标)才回退启发式:`test` 取向全程算考核,`study` 取向把「明确提问→等答→点评对错」的往返算考核。**注意**:讲解阶段 check-in 的「这块清楚吗」式确认/互动**不是考核**,绝不据此记薄弱点。
 
 若对话里找不到本次复习内容（比如没先 `/swcc-go`），告诉用户「本轮对话没有可归档的复习」，停止。
 
@@ -120,16 +120,18 @@ user-invocable: true
 ### 阶段 4：更新 progress.json
 
 - 目标节点:`status`（mastery ≥ 8 → `mastered`，否则 `in_progress`）、`mastery`、`lastReviewed`=今天（`date +%F`）、`reviewCount += 1`、按艾宾浩斯（data-contract 第六节）用**该节点的 reviewCount** 算 `nextReview`。
-- **薄弱点（只来自考核阶段）**:把子智能体返回的 `weakPoints` + 考核中卡壳/答错/掌握度低（<6）的点写入/更新 `weakPoints`（含 node/concept/mastery/createdAt/nextReview/reviewCount/consecutivePass）。
-  - 已存在的薄弱点:本次考核 `mastery ≥ 8` → `consecutivePass += 1`；否则 `consecutivePass = 0`。**`consecutivePass ≥ 2` 时移除该薄弱点。**
-  - 薄弱点的 `nextReview` 用**该薄弱点自身的 reviewCount**（本次 +1）算。
-- `stats`:`totalReviewCount += 1`;`totalReviewTime` 加本次估算时长（分钟，据对话规模估）;**全局 `streak`**（`lastReviewDate` 昨天→+1、今天→不变、否则→重置 1）;`lastReviewDate`=今天。
+- **薄弱点（只来自考核阶段）**:把子智能体返回的 `weakPoints` + 考核中卡壳/答错/掌握度低（<6）的点写入/更新 `weakPoints`。子智能体只给出 `node/concept/mastery`(候选),**其余字段由 stop 主体补齐**:
+  - **新薄弱点**(weakPoints 里原本没有):`createdAt`=今天、`reviewCount`=0、`consecutivePass`=0、`nextReview` 按 `reviewCount`(本次 +1→1)算。
+  - **已存在的薄弱点**:**继承其旧的 `reviewCount`/`consecutivePass`**,绝不重置为 0;再按下面规则更新——本次考核 `mastery ≥ 8` → `consecutivePass += 1`、否则 `consecutivePass = 0`;`reviewCount += 1`;`nextReview` 用**该薄弱点自身**(更新后的) `reviewCount` 算。**`consecutivePass ≥ 2` 时移除该薄弱点。**
+- `stats`:`totalReviewCount += 1`;`totalReviewTime` 加本次估算时长（分钟;**粗估 = 本轮你在讲解+考核里的回复条数 × 2**,有真实时间信息时以实际为准;别留空、别乱填）;**全局 `streak`**（`lastReviewDate` 昨天→+1、今天→不变、否则→重置 1）;`lastReviewDate`=今天。
 - `currentNode` 推进:本次 mastery ≥ 8 → 推进到下一个 `not_started` 叶子（先同子主题、再下个子主题）;mastery < 8 → 保持该节点;用户明确要求换下一个 → 推进但该节点保持 `in_progress`。
 
 ### 阶段 5：更新 knowledge-tree.md
 
 - 目标节点已 `mastered` → 对应行 `- [ ]` 改 `- [x]`。
 - 新产生薄弱点 → 对应行尾加 `🔴`（已有则保持）;若某行薄弱点已清除则去掉 `🔴`。
+
+> 全部落盘成功后,**删除 cwd 的 `./.swcc-checkin.md`**(本轮闭环结束,go 的深挖草稿作废;见 data-contract 第十五节)。文件不存在则忽略,不报错。
 
 ### 阶段 6：输出摘要
 

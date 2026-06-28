@@ -1,6 +1,6 @@
 ---
 name: swcc-plan
-description: Use when the user wants to prepare or review a new technical topic, build or expand a structured knowledge tree / study roadmap for a subject, or update an existing topic's tree. 触发例:「复习 X」「准备面试 X」「给我搭个 X 知识树」「plan X」「更新 X 的知识树」「把这个专题补全点」。
+description: Use when the user wants to start preparing or reviewing a technical topic, or to update / expand an existing topic. 触发例:「复习 X」「准备面试 X」「给我搭个 X 知识树」「plan X」「更新 X 的知识树」「把这个专题补全点」。
 argument-hint: "[topic] [level] [--update|--regenerate]"
 user-invocable: true
 ---
@@ -96,7 +96,7 @@ user-invocable: true
 1. 先用 Write 建文件:表头 `# <topic> 知识体系` + 末尾哨兵 `<!-- @end -->`。
 2. 用 **TodoWrite** 为每个 `##` 子主题建一个 todo（「生成+落盘 <子主题>」）。
 3. **逐子主题**:生成该子主题下所有叶子节点的四段内容（**核心问题 / 核心概念 / 面试考察点 / 来源**，严格按 data-contract 第四节 roadmap 级格式，核心概念每条带答案与原理/取舍/边界、不许只写名词）→ 用 **Edit 替换哨兵**追加该段 → 勾掉该 todo。**一个子主题一次 Edit**，绝不攒着一次写完。
-4. 子主题很多时,可按 data-contract 第十二节第 5 步**并行派起草子智能体**(每个只起草一个子主题、只返回文本、不写文件),主体再逐块 Edit 追加。
+4. 子主题很多时,可按 data-contract 第十二节第 5 步**并行派起草子智能体**(每个只起草一个子主题、只返回文本、不写文件),**收齐后按 knowledge-tree.md 的 `##` 子主题顺序**(不是按返回先后)逐块 Edit 追加;某个起草子智能体失败/超时则不阻塞其余、把它登记进 TodoWrite 由主体补写。
 
 > 门控:每块落盘后再写下一块。中途超时也能凭 TodoWrite + 已落盘内容续写，不必从头再来。
 
@@ -110,20 +110,24 @@ user-invocable: true
 拿到结果后（原则 3）:
 1. 合并三维 `gaps[]`，按 `node+suggestion` 去重。
 2. 优先 `high`、再 `medium` 补全 tree（新增节点）与 system（加深内容；**补 system 同样用分块 Edit 追加，见 data-contract 第十二节**）。
-3. **循环复审**:补完再派一轮，直到**连续一轮无新增 high/medium**（loop-until-dry），**最多 2–3 轮**。
+3. **循环复审**(loop-until-dry,定义如下，不许凭感觉收尾):
+   - **一轮** = 覆盖度 / 深度（挂书再加书本忠实度）三维评审子智能体**并行各跑一次**。
+   - **dry（终止）** = 本轮 **coverage 与 depth 两维均返回空 gaps**（book-fidelity 的 `low` 缺口**不计入**终止判定，可在篇幅允许时顺带补）。
+   - 每轮补完缺口后再派下一轮;**硬上限 3 轮**，到顶即停。
+   - 到达上限仍有未补的 high/medium → 不强撑，在摘要里**列出这些缺口**，提示用户「可稍后 `/swcc-plan <topic> --update` 补全」。
 4. 记下「评审补了哪些缺口」用于摘要。
 
 > 若三个维度的子智能体都返回空缺口,先对照 review-rubric「深度标准」逐节点核对是否真的已达标;若仍不确定,换一个更严格的视角（例如「一个挑剔的资深面试官会追问什么」）再评审一轮。
 
 ### 阶段 8：写文件 —— 必须生成 5 样，缺一不可
 
-⚠️ 必须生成下列全部 5 个文件，缺一不可。`config.json` 位于全局根目录（不在 topic 目录内）、`references.json` 即使没有资料也要建为空——这两处位置/条件特殊，**最先创建**。一律 `mkdir -p` 确保目录存在。更新模式下按 data-contract 第十一节合并语义写入，**不得覆盖已有进度**。
+⚠️ 必须生成下列全部 5 个文件，缺一不可。`config.json` 位于全局根目录（不在 topic 目录内）、`references.json` 即使没有资料也要建为空——这两处位置/条件特殊，**最先创建**。一律 `mkdir -p` 确保目录存在；建 topic 目录时**一并 `mkdir -p` 出 `review-sessions/ mock-sessions/ reports/ deep-notes/` 四个空子目录**，供后续 go/stop/mock/compound/deep 直接写入（避免首次 stop/mock 因目录缺失出错）。更新模式下按 data-contract 第十一节合并语义写入，**不得覆盖已有进度**。
 
 | # | 文件 | 位置 | 要点 |
 |---|------|------|------|
 | 1 | `config.json` | `$HOME/.study-with-cc/`（全局根） | 已存在:读出 → 追加/确认本 topic 在 `topics[]` → `activeTopic` 设为本 slug → 写回（别覆盖别的 topic）。不存在:按 data-contract 第九节新建。 |
 | 2 | `references.json` | topic 目录 | 阶段 3 的资料清单;无资料写 `{"references": []}`。**即使为空也必须创建。** |
-| 3 | `knowledge-tree.md` | topic 目录 | frontmatter（topic/slug/version/level/**kind**/createdAt，createdAt 用 `date +%F`；`kind` 按专题性质判定:编程类→`coding`，其余→`conceptual`）+ 嵌套 checkbox。新建全 `- [ ]`;更新模式按合并语义只增不毁、`version` 递增。 |
+| 3 | `knowledge-tree.md` | topic 目录 | frontmatter（topic/slug/version/level/**kind**/createdAt，createdAt 用 `date +%F`；`kind` 按 data-contract 第三节判定标准定:代码/算法/实操为主→`coding`，概念/架构/理论为主→`conceptual`，拿不准默认 `conceptual`）+ 嵌套 checkbox。新建全 `- [ ]`;更新模式按合并语义只增不毁、`version` 递增。 |
 | 4 | `knowledge-system.md` | topic 目录 | 每个叶子节点四段 roadmap 级内容。 |
 | 5 | `progress.json` | topic 目录 | 新建:每个**叶子节点**一条 `not_started`/`mastery:0`，`currentNode`=第一个叶子，weakPoints 空，stats 全 0。更新:按合并语义只补新节点、保留旧进度。节点 key 必须与 tree 层级完全一致。 |
 

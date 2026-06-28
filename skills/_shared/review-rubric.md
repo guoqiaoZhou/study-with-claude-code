@@ -75,5 +75,5 @@
 1. 合并三个维度的 `gaps[]`，按 `node + suggestion` 去重。
 2. 优先处理 `high`、其次 `medium`；`low` 视 level 与篇幅酌情。
 3. 据缺口**补全 knowledge-tree.md（新增节点）与 knowledge-system.md（加深内容）**。
-4. **循环复审**:补完后可再派一轮评审，直到**连续一轮无新增 high/medium 缺口**（loop-until-dry），**最多 2–3 轮**防止失控。
+4. **循环复审**(loop-until-dry):**一轮** = 覆盖度/深度(挂书再加书本忠实度)三维评审子智能体**并行各跑一次**;**dry(终止)** = 本轮 coverage 与 depth 两维均返回空 gaps(book-fidelity 的 `low` **不计入**终止判定);**硬上限 3 轮**,到顶仍有 high/medium 则列入摘要、提示用户用 `/swcc-plan <topic> --update` 补。
 5. 在最终摘要里说明:评审补了哪些缺口（几个 high/medium）。

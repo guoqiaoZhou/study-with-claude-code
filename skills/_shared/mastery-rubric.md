@@ -50,7 +50,7 @@
 - 考核时**卡壳、答错、或明显答浅**的具体概念；
 - 该节点 mastery `< 6` 时，把考核中暴露的薄弱概念都记上。
 
-每个薄弱点带 `node / concept / mastery / createdAt / nextReview / reviewCount`（见 data-contract 第五节）。
+每个薄弱点带 `node / concept / mastery / createdAt / nextReview / reviewCount / consecutivePass`（见 data-contract 第五节）。**子智能体只产出候选(`node/concept/mastery`)**,其余字段由 stop 主体补齐/继承。
 
 ---
 
@@ -70,9 +70,9 @@
   "depth": 8,
   "reasons": "考核覆盖了该节点约一半的核心概念；其中两处能讲清原理与取舍并举出例子，故深度评分偏高；但有一个关键机制完全没被问到，覆盖度因此中等。",
   "weakPoints": [
-    { "concept": "<考核时卡壳或只答出结论的那个具体概念>", "mastery": 4 }
+    { "node": "<该薄弱概念所属节点路径>", "concept": "<考核时卡壳或只答出结论的那个具体概念>", "mastery": 4 }
   ]
 }
 ```
 
-> stop 主体拿到该结果后，负责写 review-session（含 reasons）、更新 progress.json（mastery/status/nextReview/weakPoints/stats）、按需勾选 knowledge-tree.md。子智能体只评估、不写文件。
+> 子智能体只需返回 `node / concept / mastery`(薄弱点候选);`createdAt / nextReview / reviewCount / consecutivePass` 等字段由 **stop 主体补齐**(新点初始化、已存在的点继承旧计数,见 stop 阶段 4)。stop 主体拿到结果后，负责写 review-session（含 reasons）、更新 progress.json（mastery/status/nextReview/weakPoints/stats）、按需勾选 knowledge-tree.md。子智能体只评估、不写文件。
