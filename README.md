@@ -29,6 +29,8 @@ claude plugin install study-with-claude-code
 
 ## 命令（12 个）
 
+> 不知道用哪个?直接 **`/swcc-help`** —— 它会按"我想做 X → 用哪个命令"帮你选。
+
 **核心闭环**
 
 | 命令 | 用法 | 作用 |
