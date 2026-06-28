@@ -123,7 +123,7 @@ user-invocable: true
 |---|------|------|------|
 | 1 | `config.json` | `$HOME/.study-with-cc/`（全局根） | 已存在:读出 → 追加/确认本 topic 在 `topics[]` → `activeTopic` 设为本 slug → 写回（别覆盖别的 topic）。不存在:按 data-contract 第九节新建。 |
 | 2 | `references.json` | topic 目录 | 阶段 3 的资料清单;无资料写 `{"references": []}`。**即使为空也必须创建。** |
-| 3 | `knowledge-tree.md` | topic 目录 | frontmatter（topic/slug/version/level/createdAt，createdAt 用 `date +%F`）+ 嵌套 checkbox。新建全 `- [ ]`;更新模式按合并语义只增不毁、`version` 递增。 |
+| 3 | `knowledge-tree.md` | topic 目录 | frontmatter（topic/slug/version/level/**kind**/createdAt，createdAt 用 `date +%F`；`kind` 按专题性质判定:编程类→`coding`，其余→`conceptual`）+ 嵌套 checkbox。新建全 `- [ ]`;更新模式按合并语义只增不毁、`version` 递增。 |
 | 4 | `knowledge-system.md` | topic 目录 | 每个叶子节点四段 roadmap 级内容。 |
 | 5 | `progress.json` | topic 目录 | 新建:每个**叶子节点**一条 `not_started`/`mastery:0`，`currentNode`=第一个叶子，weakPoints 空，stats 全 0。更新:按合并语义只补新节点、保留旧进度。节点 key 必须与 tree 层级完全一致。 |
 

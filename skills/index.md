@@ -27,6 +27,14 @@ user-invocable: true
 
 > `go` / `weak` 与 `stop` 必须在**同一轮对话**里使用——stop 要读本次对话来归档。
 
+## 进阶
+
+| 技能 | 调用 | 作用 |
+|---|---|---|
+| mock | `/swcc-mock [topic] [level]` | 模拟面试：跨节点连续出题 + 独立子智能体评分报告（偏向薄弱点） |
+| compound | `/swcc-compound [topic]` | 阶段沉淀报告：聚合历次记录看趋势，写入 reports/ |
+| deep | `/swcc-deep [topic] [concept]` | 概念深挖：跨领域连接/类比/对比/延伸（可选联网），沉淀 deep-notes/ |
+
 ## 典型用法
 
 ```
@@ -35,11 +43,8 @@ user-invocable: true
 日常复习：    /swcc-go  →  答题  →  /swcc-stop
 攻克弱项：    /swcc-weak  →  答题  →  /swcc-stop
 查看进度：    /swcc-stats　切换专题：/swcc-switch
+模拟面试：    /swcc-mock　阶段报告：/swcc-compound　深挖概念：/swcc-deep <concept>
 ```
-
-## 规划中（后续阶段）
-
-`mock`（模拟面试）、`compound`（阶段沉淀报告）、`deep`（跨领域深挖）。
 
 ## 数据位置
 

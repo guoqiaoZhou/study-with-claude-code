@@ -18,8 +18,14 @@
     ├── knowledge-system.md              # 详细内容：每节点的概念解释 + 面试问题
     ├── progress.json                    # 进度 / 掌握度 / 薄弱点 / 统计
     ├── references.json                  # 参考资料引用清单（只记路径，不复制文件）
-    └── review-sessions/
-        └── <YYYY-MM-DD-HH-mm-ss>.md     # 每次复习一份归档记录
+    ├── review-sessions/
+    │   └── <YYYY-MM-DD-HH-mm-ss>.md     # go/weak 每次复习一份归档记录
+    ├── mock-sessions/                   # mock 每次模拟面试一份报告（按需创建）
+    │   └── <YYYY-MM-DD-HH-mm-ss>.md
+    ├── reports/                         # compound 阶段沉淀报告（按需创建）
+    │   └── <YYYY-MM-DD>.md
+    └── deep-notes/                      # deep 概念深挖笔记（按需创建）
+        └── <concept-slug>.md
 ```
 
 > 操作任何文件前，若目录不存在需先 `mkdir -p`。所有 JSON 用 2 空格缩进、UTF-8、保留中文原文（不转义 unicode）。
@@ -53,6 +59,7 @@ topic: <主题名>
 slug: <主题-slug>
 version: 1.0
 level: p7
+kind: conceptual
 createdAt: 2026-06-28
 ---
 
@@ -67,6 +74,8 @@ createdAt: 2026-06-28
 - [ ] <知识点 B1>
   - [ ] <子知识点 B1a> 🔴
 ```
+
+**frontmatter 字段**:`topic`/`slug`/`version`/`level`/`createdAt` 见示例;`kind` = `coding`(编程类,可出算法/实操题) 或 `conceptual`(概念类,**默认**),由 plan 生成时按专题性质判定,供 mock 决定是否出算法/实操题。
 
 **checkbox 状态标记**：
 - `- [ ]` 未掌握 / 学习中
